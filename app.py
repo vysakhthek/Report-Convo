@@ -6,6 +6,7 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 
 
+
 def get_pdf_text(pdf_files):
     text = ""
     for pdf in  pdf_files:
