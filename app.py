@@ -4,6 +4,9 @@ from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationalRetrievalChain
 
 
 
@@ -30,6 +33,17 @@ def get_vector_store(chunks_text):
     vector_store = FAISS.from_texts(texts=chunks_text, embedding=embdeddings)
     return vector_store
 
+def get_convo_chain(vector_store):
+    llm = ChatOpenAI()
+    memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
+    convo_chain = ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=vector_store.as_retriever(),
+        memory=memory
+    )
+    return convo_chain
+
+
 def main():
     load_dotenv()
     st.set_page_config(page_title="PDFConvo", page_icon=":books:")
@@ -49,6 +63,8 @@ def main():
                 # st.write(chunks_text)
 
                 vector_store = get_vector_store(chunks_text)
+
+                convo = get_convo_chain(vector_store)
 
 
 
